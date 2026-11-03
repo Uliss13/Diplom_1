@@ -27,3 +27,20 @@ class TestBurger:
         burger.add_ingredient(mock_ing_2)
         burger.move_ingredient(0, 1)
         assert burger.ingredients == [mock_ing_2, mock_ingredient]
+
+    @pytest.mark.parametrize('bun_price, ingredients_prices, expected_price', [
+        (100.0, [], 200.0),
+        (0.0, [50.0, 50.0], 100.0),
+        (100.0, [150.0, 50.0], 400.0),
+        (0.0, [], 0.0),
+    ])
+    def test_get_price(self, burger, mock_bun, bun_price, ingredients_prices, expected_price):
+        mock_bun.get_price.return_value = bun_price
+        burger.set_buns(mock_bun)
+
+        for price in ingredients_prices:
+            mock_ing = Mock()
+            mock_ing.get_price.return_value = price
+            burger.add_ingredient(mock_ing)
+
+        assert burger.get_price() == expected_price
