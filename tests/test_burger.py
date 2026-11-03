@@ -44,3 +44,29 @@ class TestBurger:
             burger.add_ingredient(mock_ing)
 
         assert burger.get_price() == expected_price
+
+    @pytest.mark.parametrize('ingredient_type, ingredient_name, ing_price, expected_receipt', [
+        ('FILLING', 'cutlet', 100.0,
+         '(==== black bun ====)\n= filling cutlet =\n(==== black bun ====)\n\nPrice: 300.0'),
+        ('SAUCE', 'hot sauce', 100.0,
+         '(==== black bun ====)\n= sauce hot sauce =\n(==== black bun ====)\n\nPrice: 300.0'),
+    ])
+    def test_get_receipt_with_ingredient(self, burger, mock_bun, mock_ingredient, ingredient_type, ingredient_name, ing_price, expected_receipt):
+        mock_bun.get_name.return_value = 'black bun'
+        mock_bun.get_price.return_value = 100.0
+        burger.set_buns(mock_bun)
+
+        mock_ingredient.get_type.return_value = ingredient_type
+        mock_ingredient.get_name.return_value = ingredient_name
+        mock_ingredient.get_price.return_value = ing_price
+        burger.add_ingredient(mock_ingredient)
+
+        assert burger.get_receipt() == expected_receipt
+
+    def test_get_receipt_without_ingredients(self, burger, mock_bun):
+        mock_bun.get_name.return_value = 'white bun'
+        mock_bun.get_price.return_value = 200.0
+        burger.set_buns(mock_bun)
+
+        expected_receipt = '(==== white bun ====)\n(==== white bun ====)\n\nPrice: 400.0'
+        assert burger.get_receipt() == expected_receipt
